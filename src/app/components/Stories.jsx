@@ -21,26 +21,24 @@ import { IoMdClose } from "react-icons/io";
 import { FaAngleRight, FaAngleLeft, FaPause, FaPlay } from "react-icons/fa6";
 import whiteLogo from '../../../public/whiteLogo.png'
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
-
-
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import Image from 'next/image';
 import Link from 'next/link';
 
-function Stories() {
+function Stories({handleZIndex}) {
   const [stories, setStories] = useState([]);
   const [currentStory, setCurrentStory] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
   const progressBarRef = useRef(null);
   const timerRef = useRef(null);
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const usersResponse = await axios.get('https://dummyjson.com/users');
         const users = usersResponse.data.users;
-
 
         const uniqueIndices = new Set();
         while (uniqueIndices.size < 10) {
@@ -97,8 +95,13 @@ function Stories() {
     console.log('Opening story at index:', index);
     setCurrentStory(stories[index]);
     setCurrentIndex(index);
+    handleZIndex()
   };
-
+  const closeStory = () => { 
+    
+    setCurrentStory(null);
+    handleZIndex()
+  }
   const nextStory = () => {
     clearTimer();
     if (currentIndex < stories.length - 1) {
@@ -128,63 +131,98 @@ function Stories() {
     }
   };
 
+  const scrollCarousel = (direction) => {
+    const container = carouselRef.current;
+    if (container) {
+      const scrollAmount = 100; // Adjust based on your item width
+      const newScrollPosition = container.scrollLeft + (direction === 'next' ? scrollAmount : -scrollAmount);
+      container.scrollTo({
+        left: newScrollPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const canScrollLeft = carouselIndex > 0;
+  const canScrollRight = carouselIndex < stories.length - 5; // Assuming 5 visible items
+
   return (
-    <div className='w-9/12 mt-12'>
+    <div className='w-9/12 mt-8 '>
       <style jsx>{`
-        .gradient-border {
-          border: 2px solid;
-          border-image-slice: 1;
-          border-width: 4px;
-          border-image-source: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
-          border-radius: 50%;
-          overflow: hidden; 
-          width: 70px;
-          height: 70px;
-        }
         .progress-bar {
-          
           height: 2px;
           background-color: #fff;
           width: 0%;
         }
+        .carousel-content::-webkit-scrollbar {
+          display: none;
+        }
+        .carousel-content {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
       `}</style>
       
-      <Carousel>
-        <CarouselContent className="gap-2 max-md:mt-12">
+      <div className="relative  overflow-hidden">
+        <div 
+          ref={carouselRef}
+          className="carousel-content flex gap-2 overflow-x-auto scroll-smooth max-md:mt-12"
+        >
           {stories.map((story, index) => (
-            <CarouselItem key={story.id} className='cursor-pointer border-2 border-l-[#feda75] border-t-[#fa7e1e] border-r-[#d62976] border-b-[#4f5bd5] flex justify-center items-center rounded-full p-0 md:basis-[12%] sm:basis-[12%] max-md:basis-[15%] lg:basis-[12%]' onClick={() => openStory(index)}>
-              <div className='rounded-full w-full'>
-                <div className='p-[0.18rem] flex justify-center items-center rounded-full w-full bg-white'>
+            <div 
+              key={story.id} 
+              className='cursor-pointer  p-[4px] bg-gradient-to-r from-[#feda75] via-[#fa7e1e] to-[#d62976] rounded-full w-full h-full' 
+              onClick={() => openStory(index)}
+            >
+              <div className='rounded-full w-full h-full'>
+                <div className='py-[0.3rem] w-20 h-20 flex justify-center items-center rounded-full  bg-white'>
                   <Image 
                     src={story.userPhoto} 
                     alt={`user ${story.id}`} 
-                    width={70} 
-                    height={70} 
-                    className='rounded-full w-full '
+                    width={80} 
+                    height={80} 
+                    className='rounded-full p-[2px] w-19 h-19 object-cover'
                   />
                 </div>
               </div>
-            </CarouselItem>
+            </div>
           ))}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
+        </div>
+        
+        <button 
+          className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white border-none w-8 h-8 rounded-full flex items-center justify-center cursor-pointer z-0 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => scrollCarousel('prev')}
+          disabled={!canScrollLeft}
+        >
+          <FaAngleLeft size={14} />
+        </button>
+        
+        <button 
+          className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white border-none w-8 h-8 rounded-full flex items-center justify-center cursor-pointer z-0 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => scrollCarousel('next')}
+          disabled={!canScrollRight}
+        >
+          <FaAngleRight size={14} />
+        </button>
+      </div>
+
       {currentStory && (
-        <div  className='fixed inset-0 p-4 bg-neutral-900 flex items-center justify-center z-50'>
-          <button className='fixed top-4 right-4 text-white  text-4xl' onClick={() => setCurrentStory(null)}><IoMdClose className='text-white'/></button>
-          <Link href={'/'} className='fixed top-4 left-4' >
+        <div className='fixed inset-0 p-4 bg-neutral-900 flex items-center justify-center z-50'>
+          <button className='fixed top-4 max-md:top-[5.5rem] z-50 right-4 text-white text-4xl' onClick={closeStory}>
+            <IoMdClose className='text-white'/>
+          </button>
+          <Link href={'/'} className='fixed top-4 left-4'>
             <Image src={whiteLogo} alt={'logo'} width={120} className='ml-auto mr-auto' />
           </Link>
-          <div className='bg-black bg-gradient-to-b from-gray-800 to-white rounded-md max-w-md w-full h-[90vh] max-md:h-[80vh] relative'>
-            <div className='progress-bar w-8/12 ml-[5%] mt-4 ' ref={progressBarRef}></div>
-            <div className='gap-2 p-4  text-white flex items-center justify-between '>
+          <div className='bg-black bg-gradient-to-b z-30 from-gray-800 to-white rounded-md max-w-md w-full h-[90vh] max-md:h-[80vh] relative'>
+            <div className='progress-bar w-8/12 ml-[5%] mt-4' ref={progressBarRef}></div>
+            <div className='gap-2 p-4 text-white flex items-center justify-between'>
               <div className='flex items-center gap-2'>
-               <Image className='rounded-full' src={currentStory.userPhoto} alt='user' width={40} />
-                <p className=' text-base'>
-                {currentStory.user}
+                <Image className='rounded-full' src={currentStory.userPhoto} alt='user' width={40} />
+                <p className='text-base'>
+                  {currentStory.user}
                 </p>
-                <p className=' text-sm text-gray-300  '>
+                <p className='text-sm text-gray-300'>
                   {currentStory.timestamp}
                 </p>
               </div>
@@ -192,33 +230,40 @@ function Stories() {
                 <button onClick={togglePause} className='ml-2'>
                   {isPaused ? <FaPlay /> : <FaPause />}
                 </button>
-                <HiOutlineDotsHorizontal className='text-2xl ' />
+                <HiOutlineDotsHorizontal className='text-2xl' />
               </div>
             </div>
-            <div className='flex justify-between items-center text-2xl relative w-full z-[60]' >
-              <button className='absolute top-60 rounded-full w-8 h-8 flex justify-center items-center max-md:-left-0 -left-20 bg-white' onClick={prevStory} disabled={currentIndex === 0}><FaAngleLeft /></button>
-              <button className='absolute top-60 rounded-full w-8 h-8 flex justify-center items-center max-md:-right-0 -right-20 bg-white' onClick={nextStory} disabled={currentIndex === stories.length - 1}><FaAngleRight /></button>
+            <div className='flex justify-between items-center text-2xl relative w-full z-0'>
+              <button 
+                className='absolute top-60 rounded-full w-8 h-8 flex justify-center items-center max-md:-left-0 -left-20 bg-white' 
+                onClick={prevStory} 
+                disabled={currentIndex === 0}
+              >
+                <FaAngleLeft />
+              </button>
+              <button 
+                className='absolute top-60 rounded-full w-8 h-8 flex justify-center items-center max-md:-right-0 -right-20 bg-white' 
+                onClick={nextStory} 
+                disabled={currentIndex === stories.length - 1}
+              >
+                <FaAngleRight />
+              </button>
             </div>
             <div className='mt-4 w-full h-5/6 flex justify-center items-center'>
-              
-                <Image 
-                  src={
-                    currentStory.content === '' ? story2 :
-                    currentStory.content
-                  } 
-                  alt={`user ${currentStory.id}`} 
-                
-                  className='rounded-lg w-full max-h-[70vh] object-contain'
-                />
-           
+              <Image 
+                src={currentStory.content === '' ? story2 : currentStory.content} 
+                alt={`user ${currentStory.id}`} 
+                className='rounded-lg w-full max-h-[70vh] object-contain'
+              />
             </div>
-         </div>
+          </div>
         </div>
       )}
-      
     </div>
   );
 }
 
 export default Stories;
+
+
 

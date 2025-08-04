@@ -2,6 +2,14 @@
 const nextConfig = {
     images: {
       domains: ['dummyjson.com'],
+      domains: [
+        'images.unsplash.com',
+        // Add any other image domains you use here
+        'another-image-host.com',
+        'last-image-domain.net',
+        'dummyjson.com'
+
+      ],
     },
     webpack: (config) => {
       // Add a rule for .mp4 files

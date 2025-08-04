@@ -3,8 +3,8 @@ import { posts } from '../data/posts'
 
 import Post from './Post';
 import Stories from './Stories';
-
-function FeedSection() {
+import { Skeleton } from '@/components/ui/skeleton';
+function FeedSection({handleZIndex}) {
 
     const shufflePosts = (arr) => {
         for (let i = arr.length - 1; i > 0; i--) {
@@ -19,11 +19,11 @@ function FeedSection() {
     const shuffledPosts = shufflePosts([...posts])
   return (
 
-    <div className='w-full flex flex-col items-center'>
+    <div className='max-md:w-full max-lg:w-full  w-8/12 flex flex-col z-[1] items-center'>
 
-      <Stories />
-      <div className='w-full flex justify-center '>
-          <div className='w-6/12 max-md:w-full'>
+      <Stories handleZIndex={handleZIndex} />
+      <div className='w-full flex z-0 justify-center '>
+          <div className='w-7/12 max-md:w-full z-0'>
 
             {
               shuffledPosts.map((post, index, i) => (
@@ -31,12 +31,12 @@ function FeedSection() {
                   <Post post={post} key={index} />
                 ))
               }
-          
       
       </div>
       
       
       </div>
+     
     </div>
       
   )

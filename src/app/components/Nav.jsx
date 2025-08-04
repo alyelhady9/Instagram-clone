@@ -21,6 +21,8 @@ import { PiPulseBold } from "react-icons/pi";
 import { FaRegSquarePlus } from "react-icons/fa6";
 import { TbBellCheck } from "react-icons/tb";
 import createPost from '../../../public/create.jpg'
+import { useSelector, useDispatch } from 'react-redux'
+import { toggleAuthModal } from '../features/AuthModalSlice'
 
 import {
     Dialog,
@@ -40,8 +42,12 @@ import {
 import Link from 'next/link'
 import { Skeleton } from '@/components/ui/skeleton'
 function Nav() {
+
+    const dispatch = useDispatch()
+    const isLoggedIn = useSelector(state => state.auth.isAuthenticated)
+    const handleLogin = () => { dispatch(toggleAuthModal()) }
   return (
-    <nav className='fixed bottom-0 z-30 items-center justify-between w-full h-16 px-4 hidden max-md:flex bg-white border-t border-gray-200'>
+    <nav className='fixed bottom-0 z-10 items-center justify-between w-full h-16 px-4 hidden max-md:flex bg-white border-t border-gray-200'>
        <Link href={"/"}>
                 <GoHomeFill className=' max-xl:w-full text-2xl' />
         </Link>
@@ -75,9 +81,16 @@ function Nav() {
         <Link href={"/messages"}>
             <RiMessengerLine className='max-xl:w-full  text-2xl' />
         </Link>
-        <Link href={"/alyelhady1"}> 
+        {
+            isLoggedIn ? (
+
+                <Link href={"/user"}> 
             <Image src={profile} alt="Profile" width = {25} height = {25} className='rounded-full ' />      
         </Link>
+            ): (
+                <div onClick={handleLogin} className=' bg-blue-500 hover:bg-blue-700 w-fit rounded-sm py-2 text-white text-center cursor-pointer px-4'>Sign in</div>
+            )
+        }
     </nav>
   )
 }
