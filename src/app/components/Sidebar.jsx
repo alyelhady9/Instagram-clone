@@ -205,7 +205,7 @@ const handleLogout = () => {
     setCreateModalOpen(!createModalOpen) 
   }
   return (
-    <div className={`z-${zIndex} w-[30%]  max-xl:min-w-[80px] max-xl:px-0 px-4 pt-8 h-screen sticky top-0 max-md:h-[80px] max-md:hidden max-md:bottom-0 bottoms max-md:w-full bg-white border-r-gray-300 border-r`}>
+    <div className={`z-${zIndex} w-[30%]  max-xl:min-w-[30%] max-xl:px-0 px-4 pt-8 h-screen sticky top-0 max-md:h-[80px] max-md:hidden max-md:bottom-0 bottoms max-md:w-full bg-white border-r-gray-300 border-r`}>
       
       <Link href={'/'} className='max-xl:hidden'>
         <Image src={logo} alt="Instagram logo" width={2500} height={900} className='w-[60%] mb-9 px-3 max-lg:hidden' />
