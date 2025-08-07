@@ -65,7 +65,7 @@ function RightSidebar() {
 
 
   return (
-    <div className='w-4/6 max-xl:hidden h-screen sticky top-0 z-0'>
+    <div className='min-w-4/6 max-xl:hidden h-screen sticky top-0 z-0'>
 
 
       <div className='w-[70%]'>
