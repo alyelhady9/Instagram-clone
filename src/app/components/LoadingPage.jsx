@@ -1,27 +1,4 @@
-// import React from 'react'
-// import logoLoading from '../../../public/logoLoading.png'
-// import metaLogo from '../../../public/metaLogo.png'
-// import Image from 'next/image'
-// function LoadingPage() {
-
-//   return (
-//     <div className='fixed z-[2000] bg-white w-full h-full flex justify-center items-center inset-0' >
-//         <Image src={logoLoading} alt='logo' width={100} height={100} />
-
-//         <div className='fixed text-center bottom-4'>
-//             <h1 className='text-lg text-gray-500 '>from</h1>
-//             <Image src={metaLogo} alt='metaLogo' width={100} height={100} />
-//         </div>
-//     </div>
-//   )
-// }
-
-// export default LoadingPage
-
-
-// src/app/components/LoadingScreen.jsx
-
-'use client'; // This is a client component
+'use client'; 
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -54,7 +31,4 @@ export default function LoadingScreen() {
             </div>
         );
     }
-
-    // Render the main page content once loading is complete
-    return <Home />;
 }
